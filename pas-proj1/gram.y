@@ -75,7 +75,7 @@ void yyerror(const char *);
 %token <y_string>LEX_ID
 
 /* type defination*/
-%type <y_string> typename new_identifier_multiple new_identifier
+%type <y_string> typename new_identifier_1 new_identifier
 %type <y_type> type_denoter type_denoter_multiple pointer_domain_type
 %type <y_type> ordinal_type pointer_type new_procedural_type structured_type
 %type <y_type> enumerated_type subrange_type
@@ -195,8 +195,6 @@ optional_par_id_list:
   ;
   
   
-//edited by ygao   3/22/2011 9:59AM
-//edited by ygao   3/22/2011 5:46PM
 id_list:
     new_identifier
   {
@@ -217,10 +215,10 @@ identifier:
   ;
 
 new_identifier:
-    new_identifier_multiple
+    new_identifier_1
   ;
 
-new_identifier_multiple:
+new_identifier_1:
     LEX_ID
 /* Standard Pascal constants */
   | p_MAXINT
@@ -337,9 +335,7 @@ constant_definition:
     new_identifier '=' static_expression semi
   ;
 
-//edited by ygao   3/22/2011 3:09PM
-//I don't touch the number part, since we just use the unsigned number
-//for this time.
+
 constant:
     identifier
   | sign identifier
@@ -435,14 +431,13 @@ enumerator:
     new_identifier
   ;
 
-//edited by ygao   3/22/2011 10:37AM
+
 subrange_type:
     constant LEX_RANGE constant
   {
   	$$ = tr_create_subrange_type(NULL, $1, $3);
   };
 
-//edited by ygao   
 pointer_type:
     pointer_char pointer_domain_type
   {
@@ -454,7 +449,6 @@ pointer_char:
   | '@'
   ;
 
-//edited by ygao   3/22/2011 10:06AM
 pointer_domain_type:
    new_identifier
   {
@@ -486,7 +480,6 @@ optional_procedural_type_formal_parameter_list:
   	$$ = $2;
   };
 
-//edited by ygao   3/22/2011 10:06AM
 procedural_type_formal_parameter_list:
     procedural_type_formal_parameter
   {
@@ -497,7 +490,6 @@ procedural_type_formal_parameter_list:
   	$$ = tr_add_para($1, $3);
   };
 
-//edited by ygao   3/22/2011 10:02AM
 procedural_type_formal_parameter:
     id_list
   {
@@ -529,14 +521,12 @@ unpacked_structured_type:
   ;
 
 /* Array */
-//edited by ygao   3/22/2011 10:44AM
 array_type:
     LEX_ARRAY '[' array_index_list ']' LEX_OF type_denoter
   {
   	$$ = tr_create_array_type($6, $3);
   };
 
-//edited by ygao   3/22/2011 10:46AM
 array_index_list:
     ordinal_index_type
   {
@@ -547,7 +537,6 @@ array_index_list:
   	$$ = tr_add_index($1, $3);
   };
 
-//edited by ygao   3/22/2011 10:46AM
 ordinal_index_type:
     ordinal_type
   | typename
@@ -640,7 +629,6 @@ variable_declaration_list:
   | variable_declaration_list variable_declaration
   ;
 
-//edited by ygao   3/22/2011 6:22PM
 variable_declaration:
     id_list ':' type_denoter semi
   {
