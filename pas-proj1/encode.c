@@ -12,7 +12,7 @@
 /****************************************************************/
 
 #include <stdlib.h>
-#include "defs.h"
+#include <defs.h>
 #include "types.h"
 #include "symtab.h"
 #include "message.h"
@@ -51,7 +51,7 @@ unsigned int get_size(TYPE type){
     tag = ty_query(type);
 
     /* For arrays */
-    INDEX_LIST i;
+    INDEX_LIST indices;
 
     /* For subrange */
     long low, high;
@@ -82,13 +82,15 @@ unsigned int get_size(TYPE type){
     	case TYARRAY:
     		/* FIXME */
     		//TYPE ty_query_array(TYPE type, INDEX_LIST *indices)
-    		return get_size(ty_query_array(type, *i)) * (high - low + 1);
+    		ty_query_subrange(type, *low, *high);
+    		return get_size(ty_query_array(type, *indices)) * (high - low + 1);
     	case TYSUBRANGE:
     		/* FIXME */
     		//TYPE ty_query_subrange(TYPE type, long *low, long *high);
+    		return get_size(ty_query_subrange(type, *low, *high));
     		return 0;
-    	// case TYPTR:
-    	// 	return sizeof(char *);
+    	case TYPTR:
+    		return sizeof(char *);
     	// case TYVOID:
     	// 	return 0;
     	// case TYSTRUCT:
@@ -126,7 +128,7 @@ int get_align(TYPE type){
     tag = ty_query(type);
 
     /* For arrays */
-    INDEX_LIST i;
+    INDEX_LIST indices;
 
     /* For subrange */
     long low, high;
@@ -157,13 +159,13 @@ int get_align(TYPE type){
     	case TYARRAY:
     		/* FIXME */
     		//TYPE ty_query_array(TYPE type, INDEX_LIST *indices)
-    		return get_align(ty_query_array(type, *i));
+    		return get_align(ty_query_array(type, *indices));
     	case TYSUBRANGE:
     		/* FIXME */
     		//TYPE ty_query_subrange(TYPE type, long *low, long *high);
     		return get_align(ty_query_subrange(type, *low, *high));
-    	// case TYPTR:
-    	// 	return sizeof(char *);
+    	case TYPTR:
+    	 	return sizeof(char *);
     	// case TYVOID:
     	// 	return 0;
     	// case TYSTRUCT:

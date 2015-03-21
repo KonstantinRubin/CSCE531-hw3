@@ -46,7 +46,7 @@
 %{
 
 /* Cause the `yydebug' variable to be defined.  */
-#include "tree.h"
+//#include "tree.h"
 #include "encode.h"
 #define YYDEBUG 1
 
