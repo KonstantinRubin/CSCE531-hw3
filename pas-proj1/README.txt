@@ -6,6 +6,8 @@ Source files:
 
 Makefile	- Compiler maintenance
 defs.h		- Global definitions
+encode.c	- Routines for encoding
+encode.h	- Definitions for encode.c
 gram.y		- The skeleton grammar for Pascal
 main.c		- The main routine
 message.c	- Message handling routines
