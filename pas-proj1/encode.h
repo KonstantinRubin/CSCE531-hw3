@@ -1,5 +1,8 @@
-#include <stdlib.h>
+/* Definitions to support encode.c */
+
+#ifndef ENCODE_H
+#define ENCODE_H
+
 #include "defs.h"
-#include "types.h"
-#include "symtab.h"
-#include "message.h"
+
+#endif
