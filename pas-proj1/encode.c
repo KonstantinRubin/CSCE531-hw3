@@ -88,7 +88,6 @@ unsigned int get_size(TYPE type){
     		/* FIXME */
     		//TYPE ty_query_subrange(TYPE type, long *low, long *high);
     		return get_size(ty_query_subrange(type, *low, *high));
-    		return 0;
     	case TYPTR:
     		return sizeof(char *);
     	// case TYVOID:
