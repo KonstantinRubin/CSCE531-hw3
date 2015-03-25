@@ -36,6 +36,7 @@
  * Modified for use at the University of South Carolina's CSCE 531
  * (Compiler Construction) course (Spring 2005) by Stephen Fenner
  * <fenner@cse.sc.edu>
+ * Simplified (Spring 2015) by Stephen Fenner
  *
  * SHIFT/REDUCE CONFLICTS
  *
@@ -45,9 +46,10 @@
 
 %{
 
-/* Cause the `yydebug' variable to be defined.  */
 //#include "tree.h"
 #include "encode.h"
+
+/* Cause the `yydebug' variable to be defined.  */
 #define YYDEBUG 1
 
 void set_yydebug(int);
@@ -171,25 +173,15 @@ void yyerror(const char *);
 /* Pascal parser starts here */
 
 pascal_program:
-    /* empty */  {}
-  | program_component_list  {}
-  ;
-
-program_component_list:
-    program_component  {}
-  | program_component_list program_component  {}
-  ;
-
-program_component:
-    main_program_declaration '.'  {}
+    main_program_declaration '.'
   ;
 
 main_program_declaration:
-    program_heading semi import_or_any_declaration_part statement_part  {}
+    program_heading semi any_global_declaration_part statement_part
   ;
 
 program_heading:
-    LEX_PROGRAM new_identifier optional_par_id_list  {}
+    LEX_PROGRAM new_identifier optional_par_id_list
   ;
 
 optional_par_id_list:
@@ -219,7 +211,7 @@ LEX_ID  { $$ = st_enter_id($1); }
 /* Standard Pascal constants */
   | p_MAXINT  
   | p_FALSE  
-| p_TRUE  
+  | p_TRUE  
 /* Standard Pascal I/O */
   | p_INPUT  
   | p_OUTPUT  
@@ -1082,55 +1074,6 @@ semi:
 optional_semicolon:
     /* empty */  {}
   | ';'  {}
-  ;
-
-optional_rename:
-    /* empty */  {}
-  | LEX_RENAME new_identifier  {}
-  ;
-
-import_part:
-    LEX_IMPORT import_specification_list semi  {}
-  | LEX_USES uses_list semi  {}
-  ;
-
-import_specification_list:
-    import_specification  {}
-  | import_specification_list semi import_specification  {}
-  ;
-
-uses_list:
-    import_specification  {}
-  | uses_list ',' import_specification  {}
-  ;
-
-import_specification:
-    new_identifier optional_access_qualifier optional_import_qualifier optional_unit_filename  {}
-  ;
-
-optional_access_qualifier:
-    /* Empty */  {}
-  | LEX_QUALIFIED  {}
-  ;
-
-optional_import_qualifier:
-    /* Empty */  {}
-  | '(' import_clause_list ')'  {}
-  | LEX_ONLY '(' import_clause_list ')'  {}
-  ;
-
-optional_unit_filename:
-    /* Empty */  {}
-  | LEX_IN combined_string  {}
-  ;
-
-import_clause_list:
-    import_clause  {}
-  | import_clause_list ',' import_clause  {}
-  ;
-
-import_clause:
-    new_identifier optional_rename  {}
   ;
 
 %%
