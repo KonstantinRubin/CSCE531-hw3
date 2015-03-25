@@ -430,8 +430,8 @@ pointer_char:
   ;
 
 pointer_domain_type:
-    new_identifier      { $$ = ty_build_ptr($1, NULL); }
-  | new_procedural_type  { $$ = ty_build_ptr(NULL, $1); };
+    new_identifier      { $$ = ty_build_unresolved_ptr($1); }
+  | new_procedural_type  { $$ = ty_build_ptr($1); };
   ;
 
 new_procedural_type: /* builds FUNC TYPE */
