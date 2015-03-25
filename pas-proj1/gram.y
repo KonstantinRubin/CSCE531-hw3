@@ -185,7 +185,7 @@ program_heading:
   ;
 
 optional_par_id_list:
-    /* empty */  {}
+    /* empty */  
   | '(' id_list ')'  { $$ = $2; }
   ;
   
@@ -260,74 +260,48 @@ LEX_ID  { $$ = st_enter_id($1); }
   | BITSIZEOF 
   ;
 
-import_or_any_declaration_part:
-    any_declaration_import_part  {}
-  ;
-
-any_declaration_import_part:
-    /* empty */  {}
-  | any_declaration_import_part any_or_import_decl  {}
-  ;
-
-any_or_import_decl:
-    import_part  {}
-  | any_decl  {}
+any_global_declaration_part:
+    /* empty */
+  | any_global_declaration_part any_decl
   ;
 
 any_declaration_part:
-    /* empty */  {}
-  | any_declaration_part any_decl  {}
+    /* empty */
+  | any_declaration_part any_decl
   ;
 
 any_decl:
-    simple_decl  {}
-  | function_declaration  {}
+    simple_decl  
+  | function_declaration  
   ;
 
 simple_decl:
     label_declaration_part  {/*ignore*/}
   | constant_definition_part  {/*ignore*/}
-  | type_definition_part  {}
-  | variable_declaration_part  {}
-  ;
-
-/* Label declaration part */
-
-label_declaration_part:
-    LEX_LABEL label_list semi  {}
-  ;
-
-label_list:
-    label  {}
-  | label_list ',' label  {}
-  ;
-
-/* Labels are returned as identifier nodes for compatibility with gcc */
-label:
-    LEX_INTCONST  {}
-  | new_identifier  {}
+  | type_definition_part  
+  | variable_declaration_part  
   ;
 
 /* constant definition part */
 
 constant_definition_part:
-    LEX_CONST constant_definition_list  {}
+    LEX_CONST constant_definition_list  
   ;
 
 constant_definition_list:
-    constant_definition  {}
-  | constant_definition_list constant_definition  {}
+    constant_definition  
+  | constant_definition_list constant_definition  
   ;
 
 constant_definition:
-    new_identifier '=' static_expression semi  {}
+    new_identifier '=' static_expression semi  
   ;
 
 constant: /* number only now */
-    identifier  {}
-  | sign identifier  {}
+    identifier  
+  | sign identifier  
   | number  { $$ = $1; }
-  | constant_literal  {}
+  | constant_literal  
   ;
 
 number:
@@ -346,23 +320,23 @@ sign:
   ;
 
 constant_literal:
-    combined_string  {}
-  | predefined_literal  {}
+    combined_string  
+  | predefined_literal  
   ;
 
 predefined_literal:
-    LEX_NIL  {}
-  | p_FALSE  {}
-  | p_TRUE  {}
+    LEX_NIL  
+  | p_FALSE  
+  | p_TRUE  
   ;
 
 combined_string:
-    string  {}
+    string  
   ;
 
 string:
-    LEX_STRCONST  {}
-  | string LEX_STRCONST  {}
+    LEX_STRCONST  
+  | string LEX_STRCONST  
   ;
 
 type_definition_part:
@@ -370,8 +344,8 @@ type_definition_part:
   ;
 
 type_definition_list:
-    type_definition  {}
-  | type_definition_list semi type_definition  {}
+    type_definition  
+  | type_definition_list semi type_definition  
   ;
 
 type_definition:
@@ -390,21 +364,21 @@ type_denoter_1: /* default actions to pass TYPE through */
   ;
 
 new_ordinal_type: /* default actions to pass TYPE through */
-    enumerated_type  {}
+    enumerated_type  
   | subrange_type  { $$ = $1; }
   ;
 
 enumerated_type:
-    '(' enum_list ')'  {}
+    '(' enum_list ')'  
   ;
 
 enum_list:
-    enumerator  {}
-  | enum_list ',' enumerator  {}
+    enumerator  
+  | enum_list ',' enumerator  
   ;
 
 enumerator:
-    new_identifier  {}
+    new_identifier  
   ;
 
 subrange_type: /* builds subrange TYPE */
@@ -417,8 +391,8 @@ new_pointer_type: /* builds pointer TYPE */
   ;
 
 pointer_char:
-    '^'  {}
-  | '@'  {}
+    '^'  
+  | '@'  
   ;
 
 pointer_domain_type:
@@ -456,9 +430,9 @@ new_structured_type: /* pass TYPE through */
 
 unpacked_structured_type: /* pass TYPE through */ 
     array_type  { $$ = $1; }
-  | file_type  {}
-  | set_type  {}
-  | record_type  {}
+  | file_type  
+  | set_type  
+  | record_type  
   ;
 
 /* Array */
@@ -478,89 +452,82 @@ ordinal_index_type: /* default actions to pass TYPE through */
   | typename  { $$ = $1; }
   ;
 
-/* FILE */
-file_type:
-    LEX_FILE direct_access_index_type LEX_OF type_denoter  {}
-  ;
-
-direct_access_index_type:
-    /* empty */  {}
-  | '[' ordinal_index_type ']'  {}
-  ;
-
 
 /* sets */
 set_type:
-    LEX_SET LEX_OF type_denoter  {}
+    LEX_SET LEX_OF type_denoter  
   ;
 
 record_type:
-    LEX_RECORD record_field_list LEX_END  {}
+    LEX_RECORD record_field_list LEX_END  
   ;
 
 record_field_list:
-    /* empty */  {}
-  | fixed_part optional_semicolon  {}
-  | fixed_part semi variant_part  {}
-  | variant_part  {}
+    /* empty */  
+  | fixed_part optional_semicolon  
+  | fixed_part semi variant_part  
+  | variant_part  
   ;
 
 fixed_part:
-    record_section  {}
-  | fixed_part semi record_section  {}
+    record_section  
+  | fixed_part semi record_section  
   ;
 
 record_section:
-    id_list ':' type_denoter  {}
+    id_list ':' type_denoter  
   ;
 
 variant_part:
-    LEX_CASE variant_selector LEX_OF variant_list rest_of_variant  {}
+    LEX_CASE variant_selector LEX_OF variant_list rest_of_variant  
   ;
 
 rest_of_variant:
-    optional_semicolon  {}
-  | case_default '(' record_field_list ')' optional_semicolon  {}
+    optional_semicolon  
+  | case_default '(' record_field_list ')' optional_semicolon  
   ;
 
 variant_selector:
-    new_identifier ':' variant_type  {}
-  | variant_type  {}
+    new_identifier ':' variant_type  
+  | variant_type  
   ;
 
 variant_type:
-    typename  {}
-  | new_ordinal_type  {}
+    typename  
+  | new_ordinal_type  
   ;
 
 variant_list:
-    variant  {}
-  | variant_list semi variant  {}
+    variant  
+  | variant_list semi variant  
   ;
 
 variant:
-    case_constant_list ':' '(' record_field_list ')'  {}
+    case_constant_list ':' '(' record_field_list ')'  
   ;
 
 case_constant_list:
-    one_case_constant  {}
-  | case_constant_list ',' one_case_constant  {}
+    one_case_constant  
+  | case_constant_list ',' one_case_constant  
   ;
 
 one_case_constant:
-    static_expression  {}
-  | static_expression LEX_RANGE static_expression  {}
+    static_expression  
+  | static_expression LEX_RANGE static_expression  
   ;
 
 /* variable declaration part */
+/* We keep track of total size needed in case of local variables by
+   using a simple inherited attribute of type int */
+/* variable declaration part */
 
 variable_declaration_part:
-    LEX_VAR variable_declaration_list  {}
+    LEX_VAR variable_declaration_list  
   ;
 
 variable_declaration_list:
-    variable_declaration  {}
-  | variable_declaration_list variable_declaration  {}
+    variable_declaration  
+  | variable_declaration_list variable_declaration  
   ;
 
 variable_declaration:
@@ -568,23 +535,23 @@ variable_declaration:
   ;
 
 function_declaration:
-    function_heading semi directive_list semi  {}
-  | function_heading semi any_declaration_part statement_part semi  {}
+    function_heading semi directive_list semi  
+  | function_heading semi any_declaration_part statement_part semi  
   ;
 
 function_heading:
-    LEX_PROCEDURE new_identifier optional_par_formal_parameter_list  {}
-  | LEX_FUNCTION new_identifier optional_par_formal_parameter_list functiontype  {}
+    LEX_PROCEDURE new_identifier optional_par_formal_parameter_list  
+  | LEX_FUNCTION new_identifier optional_par_formal_parameter_list functiontype  
   ;
 
 directive_list:
-    directive  {}
-  | directive_list semi directive  {}
+    directive  
+  | directive_list semi directive  
   ;
 
 directive:
-    LEX_FORWARD  {}
-  | LEX_EXTERNAL  {}
+    LEX_FORWARD  
+  | LEX_EXTERNAL  
   ;
 
 functiontype:
@@ -595,485 +562,437 @@ functiontype:
 /* parameter specification section */
 
 optional_par_formal_parameter_list:
-    /* empty */  {}
-  | '(' formal_parameter_list ')'  {}
+    /* empty */  
+  | '(' formal_parameter_list ')'  
   ;
 
 formal_parameter_list:
-    formal_parameter  {}
-  | formal_parameter_list semi formal_parameter  {}
+    formal_parameter  
+  | formal_parameter_list semi formal_parameter  
   ;
 
 formal_parameter:
-    id_list ':' parameter_form  {}
-  | LEX_VAR id_list ':' parameter_form  {}
-  | function_heading  {}
-  | id_list ':' conformant_array_schema  {}
-  | LEX_VAR id_list ':' conformant_array_schema  {}
+    id_list ':' typename
+  | LEX_VAR id_list ':' typename
   ;
 
-parameter_form:
-    typename  {}
-  | open_array  {}
-  ;
-
-conformant_array_schema:
-    packed_conformant_array_schema  {}
-  | unpacked_conformant_array_schema  {}
-  ;
-
-typename_or_conformant_array_schema:
-    typename  {}
-  | packed_conformant_array_schema  {}
-  | unpacked_conformant_array_schema  {}
-  ;
-
-packed_conformant_array_schema:
-    LEX_PACKED LEX_ARRAY '[' index_type_specification ']' LEX_OF typename_or_conformant_array_schema  {}
-  ;
-
-unpacked_conformant_array_schema:
-    LEX_ARRAY '[' index_type_specification_list ']' LEX_OF typename_or_conformant_array_schema  {}
-  ;
-
-index_type_specification:
-    new_identifier LEX_RANGE new_identifier ':' typename  {}
-  ;
-
-index_type_specification_list:
-    index_type_specification  {}
-  | index_type_specification_list semi index_type_specification  {}
-  ;
-
-open_array:
-    LEX_ARRAY LEX_OF typename  {}
-  ;
+/* Pascal statements */
 
 statement_part:
-    compound_statement  {}
+    compound_statement  
   ;
 
 compound_statement:
-    LEX_BEGIN statement_sequence LEX_END  {}
+    LEX_BEGIN statement_sequence LEX_END  
   ;
 
 statement_sequence:
-    statement  {}
-  | statement_sequence semi statement  {}
+    statement  
+  | statement_sequence semi statement  
   ;
 
 statement:
-    label ':' unlabelled_statement  {}
-  | unlabelled_statement  {}
+    label ':' unlabelled_statement  
+  | unlabelled_statement  
   ;
 
 unlabelled_statement:
-    structured_statement  {}
-  | simple_statement  {}
+    structured_statement  
+  | simple_statement  
   ;
 
 structured_statement:
-    compound_statement  {}
-  | with_statement  {}
-  | conditional_statement  {}
-  | repetitive_statement  {}
+    compound_statement  
+  | with_statement  
+  | conditional_statement  
+  | repetitive_statement  
   ;
 
 with_statement:
-    LEX_WITH structured_variable_list LEX_DO statement  {}
+    LEX_WITH structured_variable_list LEX_DO statement  
   ;
 
 structured_variable_list:
-    structured_variable  {}
-  | structured_variable_list ',' structured_variable  {}
+    structured_variable  
+  | structured_variable_list ',' structured_variable  
   ;
 
 structured_variable:
-    variable_or_function_access  {}
+    variable_or_function_access  
   ;
 
 conditional_statement:
-    if_statement  {}
-  | case_statement  {}
+    if_statement  
+  | case_statement  
   ;
 
 simple_if:
-    LEX_IF boolean_expression LEX_THEN statement  {}
+    LEX_IF boolean_expression LEX_THEN statement  
   ;
 
 if_statement:
-    simple_if LEX_ELSE statement  {}
-  | simple_if %prec prec_if  {}
+    simple_if LEX_ELSE statement  
+  | simple_if %prec prec_if  
   ;
 
 case_statement:
-    LEX_CASE expression LEX_OF case_element_list optional_semicolon_or_else_branch LEX_END  {}
+    LEX_CASE expression LEX_OF case_element_list optional_semicolon_or_else_branch LEX_END  
   ;
 
 optional_semicolon_or_else_branch:
-    optional_semicolon  {}
-  | case_default statement_sequence  {}
+    optional_semicolon  
+  | case_default statement_sequence  
   ;
 
 case_element_list:
-    case_element  {}
-  | case_element_list semi case_element  {}
+    case_element  
+  | case_element_list semi case_element  
   ;
 
 case_element:
-    case_constant_list ':' statement  {}
+    case_constant_list ':' statement  
   ;
 
 case_default:
-    LEX_ELSE  {}
-  | semi LEX_ELSE  {}
+    LEX_ELSE  
+  | semi LEX_ELSE  
   ;
 
 repetitive_statement:
-    repeat_statement  {}
-  | while_statement  {}
-  | for_statement  {}
+    repeat_statement  
+  | while_statement  
+  | for_statement  
   ;
 
 repeat_statement:
-    LEX_REPEAT statement_sequence LEX_UNTIL boolean_expression  {}
+    LEX_REPEAT statement_sequence LEX_UNTIL boolean_expression  
   ;
 
 while_statement:
-    LEX_WHILE boolean_expression LEX_DO statement  {}
+    LEX_WHILE boolean_expression LEX_DO statement  
   ;
 
 for_statement:
-    LEX_FOR variable_or_function_access LEX_ASSIGN expression for_direction expression LEX_DO statement  {}
+    LEX_FOR variable_or_function_access LEX_ASSIGN expression for_direction expression LEX_DO statement  
   ;
 
 for_direction:
-    LEX_TO  {}
-  | LEX_DOWNTO  {}
+    LEX_TO  
+  | LEX_DOWNTO  
   ;
 
 simple_statement:
-    empty_statement  {}
-  | goto_statement  {}
-  | assignment_or_call_statement  {}
-  | standard_procedure_statement  {}
-  | statement_extensions  {}
+    empty_statement  
+  | assignment_or_call_statement  
+  | standard_procedure_statement  
+  | statement_extensions  
   ;
 
 empty_statement:
-    /* empty */ %prec lower_than_error  {}
-  ;
-
-goto_statement:
-    LEX_GOTO label  {}
+    /* empty */ %prec lower_than_error  
   ;
 
 /* function calls */
 
 optional_par_actual_parameter_list:
-    /* empty */  {}
-  | '(' actual_parameter_list ')'  {}
+    /* empty */  
+  | '(' actual_parameter_list ')'  
   ;
 
 actual_parameter_list:
-    actual_parameter  {}
-  | actual_parameter_list ',' actual_parameter  {}
+    actual_parameter  
+  | actual_parameter_list ',' actual_parameter  
   ;
 
 actual_parameter:
-    expression  {}
+    expression  
   ;
 
 /* ASSIGNMENT and procedure calls */
 
 assignment_or_call_statement:
-    variable_or_function_access_maybe_assignment rest_of_statement  {}
+    variable_or_function_access_maybe_assignment rest_of_statement  
   ;
 
 variable_or_function_access_maybe_assignment:
-    identifier  {}
-  | address_operator variable_or_function_access  {}
-  | variable_or_function_access_no_id  {}
+    identifier  
+  | address_operator variable_or_function_access  
+  | variable_or_function_access_no_id  
   ;
 
 rest_of_statement:
-    /* Empty */  {}
-  | LEX_ASSIGN expression  {}
+    /* Empty */  
+  | LEX_ASSIGN expression  
   ;
 
 standard_procedure_statement:
-    rts_proc_onepar '(' actual_parameter ')'  {}
-  | rts_proc_parlist '(' actual_parameter_list ')'  {}
-  | p_WRITE optional_par_write_parameter_list  {}
-  | p_WRITELN optional_par_write_parameter_list  {}
-  | p_READ optional_par_actual_parameter_list  {}
-  | p_READLN optional_par_actual_parameter_list  {}
-  | p_PAGE optional_par_actual_parameter_list  {}
-  | ucsd_STR '(' write_actual_parameter_list ')'  {}
-  | p_DISPOSE '(' actual_parameter ')'  {}
-  | p_DISPOSE '(' actual_parameter ',' actual_parameter_list ')'  {}
+    rts_proc_onepar '(' actual_parameter ')'  
+  | rts_proc_parlist '(' actual_parameter_list ')'  
+  | p_WRITE optional_par_write_parameter_list  
+  | p_WRITELN optional_par_write_parameter_list  
+  | p_READ optional_par_actual_parameter_list  
+  | p_READLN optional_par_actual_parameter_list  
+  | p_PAGE optional_par_actual_parameter_list  
+  | ucsd_STR '(' write_actual_parameter_list ')'  
+  | p_DISPOSE '(' actual_parameter ')'  
+  | p_DISPOSE '(' actual_parameter ',' actual_parameter_list ')'  
   ;
 
 optional_par_write_parameter_list:
-    /* empty */  {}
-  | '(' write_actual_parameter_list ')'  {}
+    /* empty */  
+  | '(' write_actual_parameter_list ')'  
   ;
 
 write_actual_parameter_list:
-    write_actual_parameter  {}
-  | write_actual_parameter_list ',' write_actual_parameter  {}
+    write_actual_parameter  
+  | write_actual_parameter_list ',' write_actual_parameter  
   ;
 
 write_actual_parameter:
-    actual_parameter  {}
-  | actual_parameter ':' expression  {}
-  | actual_parameter ':' expression ':' expression  {}
+    actual_parameter  
+  | actual_parameter ':' expression  
+  | actual_parameter ':' expression ':' expression  
   ;
 
 /* run time system calls with one parameter */
 rts_proc_onepar:
-    p_PUT  {}
-  | p_GET  {}
-  | p_MARK  {}
-  | p_RELEASE  {}
-  | p_CLOSE  {}
-  | p_UPDATE  {}
-  | p_GETTIMESTAMP  {}
-  | p_UNBIND  {}
+    p_PUT  
+  | p_GET  
+  | p_MARK  
+  | p_RELEASE  
+  | p_CLOSE  
+  | p_UPDATE  
+  | p_GETTIMESTAMP  
+  | p_UNBIND  
   ;
 
 rts_proc_parlist:
-    p_REWRITE     /* Up to three args */  {}
-  | p_RESET       /* Up to three args */  {}
-  | p_EXTEND      /* Up to three args */  {}
-  | bp_APPEND     /* Up to three args */  {}
-  | p_PACK        /* Three args */  {}
-  | p_UNPACK      /* Three args */  {}
-  | p_BIND        /* Two args */  {}
-  | p_SEEKREAD  {}
-  | p_SEEKWRITE  {}
-  | p_SEEKUPDATE  {}
-  | p_DEFINESIZE  /* Two args */  {}
-  | LEX_AND           /* Two args */  {}
-  | LEX_OR            /* Two args */  {}
-  | LEX_NOT           /* One arg */  {}
-  | LEX_XOR        /* Two args */  {}
-  | LEX_SHL           /* Two args */  {}
-  | LEX_SHR           /* Two args */  {}
+    p_REWRITE     /* Up to three args */  
+  | p_RESET       /* Up to three args */  
+  | p_EXTEND      /* Up to three args */  
+  | bp_APPEND     /* Up to three args */  
+  | p_PACK        /* Three args */  
+  | p_UNPACK      /* Three args */  
+  | p_BIND        /* Two args */  
+  | p_SEEKREAD  
+  | p_SEEKWRITE  
+  | p_SEEKUPDATE  
+  | p_DEFINESIZE  /* Two args */  
+  | LEX_AND           /* Two args */  
+  | LEX_OR            /* Two args */  
+  | LEX_NOT           /* One arg */  
+  | LEX_XOR        /* Two args */  
+  | LEX_SHL           /* Two args */  
+  | LEX_SHR           /* Two args */  
   ;
 
 statement_extensions:
-    return_statement  {}
-  | continue_statement  {}
-  | break_statement  {}
+    return_statement  
+  | continue_statement  
+  | break_statement  
   ;
 
 return_statement:
-    RETURN_  {}
-  | RETURN_ expression  {}
-  | EXIT  {}
-  | FAIL  {}
+    RETURN_  
+  | RETURN_ expression  
+  | EXIT  
+  | FAIL  
   ;
 
 break_statement:
-    BREAK  {}
+    BREAK  
   ;
 
 continue_statement:
-    CONTINUE  {}
+    CONTINUE  
   ;
 
 variable_access_or_typename:
-    variable_or_function_access_no_id  {}
-  | LEX_ID  {}
+    variable_or_function_access_no_id  
+  | LEX_ID  
   ;
 
 index_expression_list:
-    index_expression_item  {}
-  | index_expression_list ',' index_expression_item  {}
+    index_expression_item  
+  | index_expression_list ',' index_expression_item  
   ;
 
 index_expression_item:
-    expression  {}
-  | expression LEX_RANGE expression  {}
+    expression  
+  | expression LEX_RANGE expression  
   ;
 
 /* expressions */
 
 static_expression:
-    expression  {}
+    expression  
   ;
 
 boolean_expression:
-    expression  {}
+    expression  
   ;
 
 expression:
-    expression relational_operator simple_expression  {}
-  | expression LEX_IN simple_expression  {}
-  | simple_expression  {}
+    expression relational_operator simple_expression  
+  | expression LEX_IN simple_expression  
+  | simple_expression  
   ;
 
 simple_expression:
-    term  {}
-  | simple_expression adding_operator term  {}
-  | simple_expression LEX_SYMDIFF term  {}
-  | simple_expression LEX_OR term  {}
-  | simple_expression LEX_XOR term  {}
+    term  
+  | simple_expression adding_operator term  
+  | simple_expression LEX_SYMDIFF term  
+  | simple_expression LEX_OR term  
+  | simple_expression LEX_XOR term  
   ;
 
 term:
-    signed_primary  {}
-  | term multiplying_operator signed_primary  {}
-  | term LEX_AND signed_primary  {}
+    signed_primary  
+  | term multiplying_operator signed_primary  
+  | term LEX_AND signed_primary  
   ;
 
 signed_primary:
-    primary  {}
-  | sign signed_primary  {}
+    primary  
+  | sign signed_primary  
   ;
 
 primary:
-    factor  {}
-  | primary LEX_POW factor  {}
-  | primary LEX_POWER factor  {}
-  | primary LEX_IS typename  {}
+    factor  
+  | primary LEX_POW factor  
+  | primary LEX_POWER factor  
+  | primary LEX_IS typename  
   ;
 
 signed_factor:
-    factor  {}
-  | sign signed_factor  {}
+    factor  
+  | sign signed_factor  
   ;
 
 factor:
-    variable_or_function_access  {}
-  | constant_literal  {}
-  | unsigned_number  {}
-  | set_constructor  {}
-  | LEX_NOT signed_factor  {}
-  | address_operator factor  {}
+    variable_or_function_access  
+  | constant_literal  
+  | unsigned_number  
+  | set_constructor  
+  | LEX_NOT signed_factor  
+  | address_operator factor  
   ;
 
 address_operator:
-    '@'  {}
+    '@'  
   ;
 
 variable_or_function_access:
-    variable_or_function_access_no_as  {}
-  | variable_or_function_access LEX_AS typename  {}
-  ;
-
-variable_or_function_access_no_as:
-    variable_or_function_access_no_standard_function  {}
-  | standard_functions  {}
+    variable_or_function_access_no_standard_function
+  | standard_functions
   ;
 
 variable_or_function_access_no_standard_function:
-    identifier  {}
-  | variable_or_function_access_no_id  {}
+    identifier
+  | variable_or_function_access_no_id
   ;
 
 variable_or_function_access_no_id:
-    p_OUTPUT  {}
-  | p_INPUT  {}
-  | variable_or_function_access_no_as '.' new_identifier  {}
-  | '(' expression ')'  {}
-  | variable_or_function_access pointer_char  {}
-  | variable_or_function_access '[' index_expression_list ']'  {}
-  | variable_or_function_access_no_standard_function '(' actual_parameter_list ')'  {}
-  | p_NEW '(' variable_access_or_typename ')'  {}
+    p_OUTPUT  
+  | p_INPUT  
+  | variable_or_function_access '.' new_identifier  
+  | '(' expression ')'  
+  | variable_or_function_access pointer_char  
+  | variable_or_function_access '[' index_expression_list ']'  
+  | variable_or_function_access_no_standard_function '(' actual_parameter_list ')'  
+  | p_NEW '(' variable_access_or_typename ')'  
   ;
 
 set_constructor:
-    '[' ']'  {}
-  | '[' set_constructor_element_list ']'  {}
+    '[' ']'  
+  | '[' set_constructor_element_list ']'  
   ;
 
 set_constructor_element_list:
-    member_designator  {}
-  | set_constructor_element_list ',' member_designator  {}
+    member_designator  
+  | set_constructor_element_list ',' member_designator  
   ;
 
 member_designator:
-    expression  {}
-  | expression LEX_RANGE expression  {}
+    expression  
+  | expression LEX_RANGE expression  
   ;
 
 standard_functions:
-    rts_fun_onepar '(' actual_parameter ')'  {}
-  | rts_fun_optpar optional_par_actual_parameter  {}
-  | rts_fun_parlist '(' actual_parameter_list ')'  {}
+    rts_fun_onepar '(' actual_parameter ')'  
+  | rts_fun_optpar optional_par_actual_parameter  
+  | rts_fun_parlist '(' actual_parameter_list ')'  
   ;
 
 optional_par_actual_parameter:
-    /* empty */  {}
-  |  '(' actual_parameter ')'  {}
+    /* empty */  
+  |  '(' actual_parameter ')'  
   ;
 
 rts_fun_optpar:
-    p_EOF  {}
-  | p_EOLN  {}
+    p_EOF  
+  | p_EOLN  
   ;
 
 rts_fun_onepar:
-    p_ABS  {}
-  | p_SQR  {}
-  | p_SIN  {}
-  | p_COS  {}
-  | p_EXP  {}
-  | p_LN  {}
-  | p_SQRT  {}
-  | p_ARCTAN  {}
-  | p_ARG  {}
-  | p_TRUNC  {}
-  | p_ROUND  {}
-  | p_CARD  {}
-  | p_ORD  {}
-  | p_CHR  {}
-  | p_ODD  {}
-  | p_EMPTY  {}
-  | p_POSITION  {}
-  | p_LASTPOSITION  {}
-  | p_LENGTH  {}
-  | p_TRIM  {}
-  | p_BINDING  {}
-  | p_DATE  {}
-  | p_TIME  {}
+    p_ABS  
+  | p_SQR  
+  | p_SIN  
+  | p_COS  
+  | p_EXP  
+  | p_LN  
+  | p_SQRT  
+  | p_ARCTAN  
+  | p_ARG  
+  | p_TRUNC  
+  | p_ROUND  
+  | p_CARD  
+  | p_ORD  
+  | p_CHR  
+  | p_ODD  
+  | p_EMPTY  
+  | p_POSITION  
+  | p_LASTPOSITION  
+  | p_LENGTH  
+  | p_TRIM  
+  | p_BINDING  
+  | p_DATE  
+  | p_TIME  
   ;
 
 rts_fun_parlist:
-    p_SUCC        /* One or two args */  {}
-  | p_PRED        /* One or two args */  {}
+    p_SUCC        /* One or two args */  
+  | p_PRED        /* One or two args */  
   ;
 
 relational_operator:
-    LEX_NE  {}
-  | LEX_LE  {}
-  | LEX_GE  {}
-  | '='  {}
-  | '<'  {}
-  | '>'  {}
+    LEX_NE  
+  | LEX_LE  
+  | LEX_GE  
+  | '='  
+  | '<'  
+  | '>'  
   ;
 
 multiplying_operator:
-    LEX_DIV  {}
-  | LEX_MOD  {}
-  | '/'  {}
-  | '*'  {}
+    LEX_DIV  
+  | LEX_MOD  
+  | '/'  
+  | '*'  
   ;
 
 adding_operator:
-    '-'  {}
-  | '+'  {}
+    '-'  
+  | '+'  
   ;
 
 semi:
-    ';'  {}
+    ';'  
   ;
 
 optional_semicolon:
-    /* empty */  {}
-  | ';'  {}
+    /* empty */  
+  | ';'  
   ;
 
 %%
