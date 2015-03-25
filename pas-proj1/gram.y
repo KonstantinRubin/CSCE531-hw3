@@ -276,8 +276,7 @@ any_decl:
   ;
 
 simple_decl:
-    label_declaration_part  {/*ignore*/}
-  | constant_definition_part  {/*ignore*/}
+    constant_definition_part  {/*ignore*/}
   | type_definition_part  
   | variable_declaration_part  
   ;
@@ -320,7 +319,7 @@ sign:
   ;
 
 constant_literal:
-    combined_string  
+    string  
   | predefined_literal  
   ;
 
@@ -328,10 +327,6 @@ predefined_literal:
     LEX_NIL  
   | p_FALSE  
   | p_TRUE  
-  ;
-
-combined_string:
-    string  
   ;
 
 string:
@@ -351,16 +346,12 @@ type_definition_list:
 type_definition:
     new_identifier '=' type_denoter  { create_typename( $1, $3 ); }
 
-type_denoter: /* default actions to pass TYPE through */
-    typename  { $$ = $1; }
-  | type_denoter_1  { $$ = $1; }
-  ;
-
-type_denoter_1: /* default actions to pass TYPE through */
-    new_ordinal_type  { $$ = $1;}
+type_denoter:
+    typename    { $$ = $1; }
+  | new_ordinal_type  { $$ = $1; }
   | new_pointer_type  { $$ = $1; }
-  | new_procedural_type  { $$ = $1; }
-  | new_structured_type  { $$ = $1; }
+  | new_procedural_type { $$ = $1; }
+  | new_structured_type { $$ = $1; }
   ;
 
 new_ordinal_type: /* default actions to pass TYPE through */
@@ -424,15 +415,9 @@ procedural_type_formal_parameter:
   ;
 
 new_structured_type: /* pass TYPE through */
-    LEX_PACKED unpacked_structured_type  { $$ = $2; }
-  | unpacked_structured_type  { $$ = $1; }
-  ;
-
-unpacked_structured_type: /* pass TYPE through */ 
     array_type  { $$ = $1; }
-  | file_type  
-  | set_type  
-  | record_type  
+  | set_type  { $$ = $1; }
+  | record_type { $$ = $1; }
   ;
 
 /* Array */
@@ -519,7 +504,6 @@ one_case_constant:
 /* variable declaration part */
 /* We keep track of total size needed in case of local variables by
    using a simple inherited attribute of type int */
-/* variable declaration part */
 
 variable_declaration_part:
     LEX_VAR variable_declaration_list  
@@ -592,13 +576,8 @@ statement_sequence:
   ;
 
 statement:
-    label ':' unlabelled_statement  
-  | unlabelled_statement  
-  ;
-
-unlabelled_statement:
-    structured_statement  
-  | simple_statement  
+    structured_statement
+  | simple_statement
   ;
 
 structured_statement:
