@@ -6,7 +6,6 @@
 
 #include <ctype.h>
 #include <string.h>
-#include <stdlib.h>
 
 #include "defs.h"
 #include "types.h"
@@ -16,8 +15,7 @@
 /* defined in defs.h */
 #include BACKEND_HEADER_FILE
 #include "y.tab.h"
-#include "tree.h"
-extern int yylineno;
+#include<"tree.h">
 
 #undef yywrap
 
