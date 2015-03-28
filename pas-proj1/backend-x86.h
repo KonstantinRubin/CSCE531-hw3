@@ -49,8 +49,8 @@ typedef enum { B_PRE_INC, B_POST_INC, B_PRE_DEC, B_POST_DEC } B_INC_DEC_OP;
    and a label for that variable, as well as an .align to the appropriate
    alignment and a .size to the appropriate size.  A typical simple variable
    declaration (e.g. an int) is accomplished by a call to b_globl_decl followed
-   by a call to the appropriate b_alloc function (b_alloc_int in the
-   case of an int).
+   by a call to the appropriate b_alloc function for initialized date
+   (b_alloc_int in the case of an int), or to b_skip() for uninitialized data.
 
    For example, to emit code for the global declaration ``int i=5;'',
    one might call

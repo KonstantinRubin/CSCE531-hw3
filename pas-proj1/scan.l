@@ -16,8 +16,6 @@
 /* defined in defs.h */
 #include BACKEND_HEADER_FILE
 #include "y.tab.h"
-#include "tree.h"
-extern int yylineno;
 
 #undef yywrap
 
@@ -30,132 +28,139 @@ YYSTYPE yylval;
 
 %}
 
-D			[0-9]
-L			[a-zA-Z_]
-E			[Ee][+-]?{D}+
+D	[0-9]
+L	[a-zA-Z_]
+E	[Ee][+-]?{D}+
+ID	{L}({L}|{D})*
+IC	{D}+
+RC	{D}+"."{D}+({E})?
+SC	"'"([^'\r\n\f\v\b]|"''")*"'"
+WS	[ \t\f\v\r\b\n]+
+
+%option case-insensitive
 
 %%
 
-[ \t\f\v\r\b\n]+		{ count(); }
-"{" 				{ comment(1); }
-"(*"				{ comment(2); }
-[Aa][Bb][Ss]			{ count(); return p_ABS; }
-[Aa][Nn][Dd]			{ count(); return LEX_AND; }
-[Aa][Rr][Cc][Tt][Aa][Nn]	{ count(); return p_ARCTAN; }
-[Aa][Rr][Rr][Aa][Yy]		{ count(); return LEX_ARRAY; }
-[Bb][Ee][Gg][Ii][Nn]		{ count(); return LEX_BEGIN; }
-[Bb][Rr][Ee][Aa][Kk]		{ count(); return BREAK; }
-[Cc][Aa][Ss][Ee]		{ count(); return LEX_CASE; }
-[Cc][Hh][Rr]			{ count(); return p_CHR; }
-[Cc][Oo][Nn][Ss][Tt]		{ count(); return LEX_CONST; }
-[Cc][Oo][Nn][Tt][Ii][Nn][Uu][Ee]	{ count(); return CONTINUE; }
-[Cc][Oo][Ss]			{ count(); return p_COS; }
-[Dd][Ii][Ss][Pp][Oo][Ss][Ee]	{ count(); return p_DISPOSE; }
-[Dd][Ii][Vv]			{ count(); return LEX_DIV; }
-[Dd][Oo]			{ count(); return LEX_DO; }
-[Dd][Oo][Ww][Nn][Tt][Oo]	{ count(); return LEX_DOWNTO; }
-[Ee][Ll][Ss][Ee]		{ count(); return LEX_ELSE; }
-[Ee][Nn][Dd]			{ count(); return LEX_END; }
-[Ee][Oo][Ff]			{ count(); return p_EOF; }
-[Ee][Oo][Ll][Nn]		{ count(); return p_EOLN; }
-[Ee][Xx][Pp]			{ count(); return p_EXP; }
-[Ee][Xx][Tt][Ee][Rr][Nn][Aa][Ll]	{ count(); return LEX_EXTERNAL; }
-[Ff][Aa][Ll][Ss][Ee]		{ count(); return p_FALSE; }
-[Ff][Ii][Ll][Ee]		{ count(); return LEX_FILE; }
-[Ff][Oo][Rr]			{ count(); return LEX_FOR; }
-[Ff][Oo][Rr][Ww][Aa][Rr][Dd]	{ count(); return LEX_FORWARD; }
-[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn]	{ count(); return LEX_FUNCTION; }
-[Gg][Ee][Tt]			{ count(); return p_GET; }
-[Gg][Oo][Tt][Oo]		{ count(); return LEX_GOTO; }
-[Ii][Ff]			{ count(); return LEX_IF; }
-[Ii][Nn]			{ count(); return LEX_IN; }
-[Ii][Nn][Pp][Uu][Tt]		{ count(); return p_INPUT; }
-[Ii][Ss]			{ count(); return LEX_IS; }
-[Ll][Aa][Bb][Ee][Ll]		{ count(); return LEX_LABEL; }
-[Ll][Nn]			{ count(); return p_LN; }
-[Mm][Aa][Xx][Ii][Nn][Tt]	{ count(); return p_MAXINT; }
-[Mm][Oo][Dd]			{ count(); return LEX_MOD; }
-[Nn][Ee][Ww]			{ count(); return p_NEW; }
-[Nn][Ii][Ll]			{ count(); return LEX_NIL; }
-[Nn][Oo][Tt]			{ count(); return LEX_NOT; }
-[Oo][Dd][Dd]			{ count(); return p_ODD; }
-[Oo][Ff]			{ count(); return LEX_OF; }
-[Oo][Rr]			{ count(); return LEX_OR; }
-[Oo][Rr][Dd]			{ count(); return p_ORD; }
-[Oo][Uu][Tt][Pp][Uu][Tt]	{ count(); return p_OUTPUT; }
-[Pp][Aa][Cc][Kk]		{ count(); return p_PACK; }
-[Pp][Aa][Cc][Kk][Ee][Dd]	{ count(); return LEX_PACKED; }
-[Pp][Aa][Gg][Ee]		{ count(); return p_PAGE; }
-[Pp][Rr][Ee][Dd]		{ count(); return p_PRED; }
-[Pp][Rr][Oo][Cc][Ee][Dd][Uu][Rr][Ee]	{ count(); return LEX_PROCEDURE; }
-[Pp][Rr][Oo][Gg][Rr][Aa][Mm]	{ count(); return LEX_PROGRAM; }
-[Pp][Uu][Tt]			{ count(); return p_PUT; }
-[Rr][Ee][Aa][Dd]		{ count(); return p_READ; }
-[Rr][Ee][Aa][Dd][Ll][Nn]	{ count(); return p_READLN; }
-[Rr][Ee][Cc][Oo][Rr][Dd]	{ count(); return LEX_RECORD; }
-[Rr][Ee][Pp][Ee][Aa][Tt]	{ count(); return LEX_REPEAT; }
-[Rr][Ee][Ss][Ee][Tt]		{ count(); return p_RESET; }
-[Rr][Ee][Ww][Rr][Ii][Tt][Ee]	{ count(); return p_REWRITE; }
-[Rr][Oo][Uu][Nn][Dd]		{ count(); return p_ROUND; }
-[Ss][Ee][Tt]			{ count(); return LEX_SET; }
-[Ss][Ii][Nn]			{ count(); return p_SIN; }
-[Ss][Qq][Rr]			{ count(); return p_SQR; }
-[Ss][Qq][Rr][Tt]		{ count(); return p_SQRT; }
-[Ss][Uu][Cc][Cc]		{ count(); return p_SUCC; }
-[Tt][Hh][Ee][Nn]		{ count(); return LEX_THEN; }
-[Tt][Oo]			{ count(); return LEX_TO; }
-[Tt][Rr][Uu][Ee]		{ count(); return p_TRUE; }
-[Tt][Rr][Uu][Nn][Cc]		{ count(); return p_TRUNC; }
-[Tt][Yy][Pp][Ee]		{ count(); return LEX_TYPE; }
-[Uu][Nn][Pp][Aa][Cc][Kk]	{ count(); return p_UNPACK; }
-[Uu][Nn][Tt][Ii][Ll]		{ count(); return LEX_UNTIL; }
-[Uu][Ss][Ee][Ss]		{ count(); return LEX_USES; }
-[Vv][Aa][Rr]			{ count(); return LEX_VAR; }
-[Ww][Hh][Ii][Ll][Ee]		{ count(); return LEX_WHILE; }
-[Ww][Ii][Tt][Hh]		{ count(); return LEX_WITH; }
-[Ww][Rr][Ii][Tt][Ee]		{ count(); return p_WRITE; }
-[Ww][Rr][Ii][Tt][Ee][Ll][Nn]	{ count(); return p_WRITELN; }
-[Xx][Oo][Rr]			{ count(); return LEX_XOR; }
-{L}({L}|{D})*			{
-				    count();
-				    yylval.y_string = convert_id(yytext);
-				    return LEX_ID;
-				}
-{D}+				{
-				    count();
-				    yylval.y_int = strtol(yytext,0,10);
-				    return LEX_INTCONST;
-				}
-{D}+"."{D}+({E})?      		{
-				    count();
-				    yylval.y_real = strtod(yytext,0);
-				    return LEX_REALCONST;
-				}
-"'"([^'\r\n\f\v\b]|"''")*"'"	{
-				    count();
-				    yylval.y_string= convert_str_const(yytext);
-				    return LEX_STRCONST;
-				}
-"(."				{ count(); return '['; }
-".)"				{ count(); return ']'; }
-".."				{ count(); return LEX_RANGE; }
-"..."				{ count(); return LEX_ELLIPSIS; }
-":="				{ count(); return LEX_ASSIGN; }
-"<="				{ count(); return LEX_LE; }
-">="				{ count(); return LEX_GE; }
-"<>"				{ count(); return LEX_NE; }
-"><"				{ count(); return LEX_SYMDIFF; }
-"=>"				{ count(); return LEX_RENAME; }
-"**"				{ count(); return LEX_POWER; }
-"+>"				{ count(); return LEX_CEIL_PLUS; }
-"->"				{ count(); return LEX_CEIL_MINUS; }
-"*>"				{ count(); return LEX_CEIL_MULT; }
-"/>"				{ count(); return LEX_CEIL_DIV; }
-"+<"				{ count(); return LEX_FLOOR_PLUS; }
-"-<"				{ count(); return LEX_FLOOR_MINUS; }
-"*<"				{ count(); return LEX_FLOOR_MULT; }
-"/<"				{ count(); return LEX_FLOOR_DIV; }
-.				{ count(); return yytext[0]; }
+{WS}	{ count(); }
+"{"	{ comment(1); }
+"(*"	{ comment(2); }
+abs		{ count(); return p_ABS; }
+and		{ count(); return LEX_AND; }
+arctan		{ count(); return p_ARCTAN; }
+array		{ count(); return LEX_ARRAY; }
+begin		{ count(); return LEX_BEGIN; }
+break		{ count(); return BREAK; }
+case		{ count(); return LEX_CASE; }
+chr		{ count(); return p_CHR; }
+const		{ count(); return LEX_CONST; }
+continue	{ count(); return CONTINUE; }
+cos		{ count(); return p_COS; }
+dispose		{ count(); return p_DISPOSE; }
+div		{ count(); return LEX_DIV; }
+do		{ count(); return LEX_DO; }
+downto		{ count(); return LEX_DOWNTO; }
+else		{ count(); return LEX_ELSE; }
+end		{ count(); return LEX_END; }
+eof		{ count(); return p_EOF; }
+eoln		{ count(); return p_EOLN; }
+exp		{ count(); return p_EXP; }
+external	{ count(); return LEX_EXTERNAL; }
+false		{ count(); return p_FALSE; }
+file		{ count(); return LEX_FILE; }
+for		{ count(); return LEX_FOR; }
+forward		{ count(); return LEX_FORWARD; }
+function	{ count(); return LEX_FUNCTION; }
+get		{ count(); return p_GET; }
+goto		{ count(); return LEX_GOTO; }
+if		{ count(); return LEX_IF; }
+in		{ count(); return LEX_IN; }
+input		{ count(); return p_INPUT; }
+is		{ count(); return LEX_IS; }
+label		{ count(); return LEX_LABEL; }
+ln		{ count(); return p_LN; }
+maxint		{ count(); return p_MAXINT; }
+mod		{ count(); return LEX_MOD; }
+new		{ count(); return p_NEW; }
+nil		{ count(); return LEX_NIL; }
+not		{ count(); return LEX_NOT; }
+odd		{ count(); return p_ODD; }
+of		{ count(); return LEX_OF; }
+or		{ count(); return LEX_OR; }
+ord		{ count(); return p_ORD; }
+output		{ count(); return p_OUTPUT; }
+pack		{ count(); return p_PACK; }
+packed		{ count(); return LEX_PACKED; }
+page		{ count(); return p_PAGE; }
+pred		{ count(); return p_PRED; }
+procedure	{ count(); return LEX_PROCEDURE; }
+program		{ count(); return LEX_PROGRAM; }
+put		{ count(); return p_PUT; }
+read		{ count(); return p_READ; }
+readln		{ count(); return p_READLN; }
+record		{ count(); return LEX_RECORD; }
+repeat		{ count(); return LEX_REPEAT; }
+reset		{ count(); return p_RESET; }
+rewrite		{ count(); return p_REWRITE; }
+round		{ count(); return p_ROUND; }
+set		{ count(); return LEX_SET; }
+sin		{ count(); return p_SIN; }
+sqr		{ count(); return p_SQR; }
+sqrt		{ count(); return p_SQRT; }
+succ		{ count(); return p_SUCC; }
+then		{ count(); return LEX_THEN; }
+to		{ count(); return LEX_TO; }
+true		{ count(); return p_TRUE; }
+trunc		{ count(); return p_TRUNC; }
+type		{ count(); return LEX_TYPE; }
+unpack		{ count(); return p_UNPACK; }
+until		{ count(); return LEX_UNTIL; }
+uses		{ count(); return LEX_USES; }
+var		{ count(); return LEX_VAR; }
+while		{ count(); return LEX_WHILE; }
+with		{ count(); return LEX_WITH; }
+write		{ count(); return p_WRITE; }
+writeln		{ count(); return p_WRITELN; }
+xor		{ count(); return LEX_XOR; }
+{ID}	{
+	    count();
+	    yylval.y_string = convert_id(yytext);
+	    return LEX_ID;
+	}
+{IC}	{
+	    count();
+	    yylval.y_int = strtol(yytext,0,10);
+	    return LEX_INTCONST;
+	}
+{RC}	{
+	    count();
+	    yylval.y_real = strtod(yytext,0);
+	    return LEX_REALCONST;
+	}
+{SC}	{
+	    count();
+	    yylval.y_string= convert_str_const(yytext);
+	    return LEX_STRCONST;
+	}
+"(."	{ count(); return '['; }
+".)"	{ count(); return ']'; }
+".."	{ count(); return LEX_RANGE; }
+"..."	{ count(); return LEX_ELLIPSIS; }
+":="	{ count(); return LEX_ASSIGN; }
+"<="	{ count(); return LEX_LE; }
+">="	{ count(); return LEX_GE; }
+"<>"	{ count(); return LEX_NE; }
+"><"	{ count(); return LEX_SYMDIFF; }
+"=>"	{ count(); return LEX_RENAME; }
+"**"	{ count(); return LEX_POWER; }
+"+>"	{ count(); return LEX_CEIL_PLUS; }
+"->"	{ count(); return LEX_CEIL_MINUS; }
+"*>"	{ count(); return LEX_CEIL_MULT; }
+"/>"	{ count(); return LEX_CEIL_DIV; }
+"+<"	{ count(); return LEX_FLOOR_PLUS; }
+"-<"	{ count(); return LEX_FLOOR_MINUS; }
+"*<"	{ count(); return LEX_FLOOR_MULT; }
+"/<"	{ count(); return LEX_FLOOR_DIV; }
+.	{ count(); return yytext[0]; }
 
 %%
 
@@ -232,7 +237,8 @@ int digit(char c)
 
 
 /* Determines if the given character can legally follow a backslash
-   in a Pascal string constant */
+   in a Pascal string constant.  Used in convert_str_const(), below.
+*/
 BOOLEAN is_escchar(char c)
 {
     switch (c)
@@ -250,6 +256,13 @@ BOOLEAN is_escchar(char c)
 }
 
 
+/* Make the initial letter upper case and the rest lower case.
+   This serves two purposes:
+     1.  Differently cased versions of the same identifier will map
+         to the same string (needed by the symbol table)
+     2.  Initial caps won't conflict with any names of external library
+         routines
+*/
 char * convert_id(const char * s)
 {
     char *str = st_save_string(s);
@@ -275,7 +288,7 @@ char * convert_str_const(const char * str)
     if (*str++ != '\'')
 	bug("Malformed string constant: no initial single quote");
 
-    for (p = str+1; *p != '\0'; p++,len++)
+    for (p = str; *p != '\0'; p++,len++)
     {
 	if (*p == '\\' && !is_escaped)
 	    is_escaped = TRUE;
@@ -304,6 +317,9 @@ char * convert_str_const(const char * str)
     if (!is_quote)
 	bug("convert_str_const: malformed string");
 
+    /* Account for the final single quote */
+    len--;
+
     /* Allocate new memory for the converted string, sans quotes. */
 
     q = buf = (char *)malloc(sizeof(char) * (len + 1));
@@ -312,7 +328,7 @@ char * convert_str_const(const char * str)
 	fatal("convert_str_const: out of memory");
 
     /* str is pointing to the first char after the initial quote. */
-    /* Loop invariant: p points to the next free space in buf. */
+    /* Loop invariant: q points to the next free space in buf. */
     while (0 < len)
 	if (*str == '\'') {
 	    if (*(str+1) == '\'') {
