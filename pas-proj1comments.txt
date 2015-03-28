@@ -1,4 +1,4 @@
-Comments for self-test -------- Fri Mar 27, 2015 at 11:2:50 EDT
+Comments for self-test -------- Sat Mar 28, 2015 at 12:38:13 EDT
 No illegal files found
 Testing ppc3:
   Attempting to build ppc3 ... ok

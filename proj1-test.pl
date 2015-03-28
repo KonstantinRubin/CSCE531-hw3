@@ -10,7 +10,7 @@
 # This script must be run under the bash shell!
 
 # edit as needed
-$project_directory = "/acct/s1/kyrubin/CSCE531/hw3/version2/pas-proj1";
+$project_directory = "/home/optimus/531/proj1/CSCE531-hw3/pas-proj1";
 $semester = 'sp15';
 
 # This varies by system
