@@ -108,13 +108,13 @@ ST_ID  st_enter_id(char *id);
   is the "enrollment papers" for the identifier and are presented
   to the symbol table when future actions are requested for the
   identifier. Once an id is enrolled, it stays enrolled, even if the
-  block in which it was enrolled is exited.
+  block in which it was enrolled is exited.  (PROJ1)
 */
 
 char  *st_get_id_str(ST_ID id);
 /*
   Given the "enrollment papers" of an identifier, returns
-  the identifier string.
+  the identifier string.  (PROJ1)
 */
 
 void  st_enter_block(void);
@@ -134,13 +134,14 @@ int  st_get_cur_block(void);
 /*
   No parameters: returns the block number of the current block.
   Globals are in block one; predefined objects are in block zero.
+  (PROJ1)
 */
 
 BOOLEAN  st_install(ST_ID id, ST_DR data);
 /*
   Installs a piece of data with the enrolled id. Returns FALSE
   if a piece of data is already installed with the given id; TRUE
-  otherwise.  Data is installed in the current block.
+  otherwise.  Data is installed in the current block.  (PROJ1)
 */
 
 extern ST_DR  st_lookup(ST_ID id, int *block);
@@ -150,7 +151,7 @@ extern ST_DR  st_lookup(ST_ID id, int *block);
   an output parameter: the block number of the block in which the
   data was found. A search of blocks from the current back to the
   global is performed. The first occurence found is returned.
-  If no data is found, NULL is returned.
+  If no data is found, NULL is returned.  (PROJ1)
 */
 
 extern BOOLEAN st_replace(ST_ID id, ST_DR data);
