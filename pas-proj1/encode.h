@@ -1,28 +1,21 @@
+/* Definitions to support encode.c */
+
 #ifndef ENCODE_H
 #define ENCODE_H
+
+#include "defs.h"
 #include "types.h"
-#include "symtab.h"
 #include "message.h"
 #include "tree.h"
 
+/* This method declares and allocates a variable by 
+   setting the alignment and size for the appropriate type */
+void declare_var(VAR_ID_LIST list_id, TYPE type);//ST_ID st_id, TYPE type);
 
+/* This method returns the size of a type based on the type given */
+unsigned int get_size(TYPE type);
 
-
-/*set the size and alignment with b_global_decl for basic types*/
-
-void simple_allocate_space (char *id, TYPE type);
-
-/*set the size and alignment with b_global_decl for arrays*/
-
-void array_allocate_space (char *id, TYPE array, INDEX_LIST *i);
-
-/*set the size and alignment with b_global_decl for subrange*/
-
-void subrange_allocate_space (char *id, TYPE type, long *low, long *high);
-
-void decl(TYPE type, VAR_ID_LIST list_id);
-
-int get_array_size(TYPE type, int);
-
+/* This method returns the alignment of a type based on the type given */
+int get_align(TYPE type);
 
 #endif

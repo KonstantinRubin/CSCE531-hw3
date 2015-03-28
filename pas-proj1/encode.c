@@ -1,241 +1,185 @@
+/****************************************************************/
+/*																*/
+/*	CSCE531 - "Pascal" and "C" Compilers						*/
+/*																*/
+/*	--encode.c--												*/
+/*																*/
+/*	This File Contains routines that support the				*/
+/*	"Encode Module".											*/
+/*																*/
+/*	Maximus Brandel												*/
+/*																*/
+/****************************************************************/
+
 #include <stdlib.h>
-#include <stdio.h>
+#include "defs.h"
+#include "types.h"
+#include "symtab.h"
+#include "message.h"
+#include "backend-x86.h"
 #include "encode.h"
 
+void declare_var(VAR_ID_LIST list_id, TYPE type){
+	/* Return if type tag is TYERROR OR TYFUNC */
+	if (ty_query(type) == TYERROR || ty_query(type) == TYFUNC) return;
 
-void simple_allocate_space (char *id, TYPE type)
-{
-	int size = simple_size (type);
-	int alignment = size;
-	if (size != 0){
-		b_global_decl (id, alignment, size);
-		b_skip(size);
-	}
-	else
-	{
-		error("This is an invalid type name");
-	}
-}
+	/* While list_id != NULL */
+	while(list_id){
+		ST_ID st_id = list_id->id;	
+		/* Get the id from the Symbol Table */
+		char *id = st_get_id_str(st_id);
+		/* Get the size and alignment of the type */
+		unsigned int size = get_size(type);
+		int alignment = get_align(type);
 
-void array_allocate_space (char *id, TYPE array, INDEX_LIST *i)
-{
-	TYPE simple_type = ty_query_array (array, *i);
-
-	int size = simple_size (simple_type);
-	int asize = size * sizeof(i);
-
-	b_global_decl (id, size, asize);
-	b_skip(size);
-
-}
-
-void subrange_allocate_space (char *id, TYPE type, long *low, long *high)
-{
-	TYPE sub_type = ty_query_subrange(type, low, high);
-
-	int size = simple_size (sub_type);
-
-	b_global_decl (id, size, size);
-	b_skip(size);
-}
-
-void decl(TYPE type, VAR_ID_LIST list_id)
-{
-
-	if (ty_query(type)==TYERROR) return;
-	if (ty_query(type)==TYFUNC) return;
-
-	while (list_id) {
-		ST_ID id = list_id->id;
-
-		int align;
-		unsigned int size;
-		char *id_decl;
-		TYPETAG tag;
-
-		if (!id)bug("Received NULL ST_ID\n");
-
-		tag = ty_query(type);
-		if(tag == TYARRAY) {
-			align=simple_size(type);
-			size=get_array_size(type, align);
-		}
-		else {
-			size=align=simple_size(type);
-		}
-
-		id_decl=st_get_id_str(id);
-
-		b_global_decl(id_decl, align, size);
-
-		switch (tag)
-		{
-			case TYARRAY:
-				b_skip(size);
-				break;
-			case TYSET:
-				bug("illegal typetag (%d) in \"get_size\"", tag);
-				break;
-			case TYPTR:
-				b_skip(size);
-				break;
-			case TYSTRUCT:
-				bug("illegal typetag (%d) in \"get_size\"", tag);
-				break;
-			case TYUNION:
-				bug("illegal typetag (%d) in \"get_size\"", tag);
-				break;
-			case TYENUM:
-				bug("illegal typetag (%d) in \"get_size\"", tag);
-				break;
-			case TYFUNC:	
-				break;
-			case TYSUBRANGE:
-				b_skip(size);
-				break;
-			case TYFLOAT:
-				b_skip(size);
-				break;
-			case TYDOUBLE:
-				b_skip(size);
-				break;
-			case TYLONGDOUBLE:
-				b_skip(size);
-				break;
-			case TYUNSIGNEDINT:
-				b_skip(size);
-				break;
-			case TYUNSIGNEDCHAR:
-				b_skip(size);
-				break;
-			case TYUNSIGNEDSHORTINT:
-				b_skip(size);
-				break;
-			case TYUNSIGNEDLONGINT:
-				b_skip(size);
-				break;
-			case TYSIGNEDCHAR:
-				b_skip(size);
-				break;
-			case TYSIGNEDINT:
-				b_skip(size);
-				break;
-			case TYSIGNEDLONGINT:
-				b_skip(size);
-				break;
-			case TYSIGNEDSHORTINT:
-				b_skip(size);
-				break;
-			case TYVOID:
-				msgn("void");
-				break;
-			case TYERROR:
-				msgn("error");
-				break;
-			default:
-				bug("illegal typetag (%d) in \"ty_print_type\"", tag);
-		}
-
+		if (size != 0 && alignment != 0){
+			/* Call backend functions */
+			/* Declare variable*/
+			b_global_decl(id, alignment, size);
+			/* Allocate memory for the variable */
+			b_skip(size);
+		}else
+			bug("Something messed up in declare_var");
+		/* Go to next item in list */	
 		list_id = list_id->next;
 	}
 }
 
+unsigned int get_size(TYPE type){
 
-int get_array_size(TYPE a_type, int align) {
-	long low, high;
-	TYPE object;
-	TYPE type;
-	unsigned int a_size = align;
-	INDEX_LIST indices;
-	
+    /* Get the TYPETAG from ty_query */
+    TYPETAG tag;
+    tag = ty_query(type);
 
-	type = a_type;
-	while (ty_query(type) == TYARRAY) {
-		type = ty_query_array(type, &indices);
-		while (indices != NULL) { 
-			object = ty_query_subrange(indices->type,&low,&high);
-			a_size *= high - low + 1;
+    /* For arrays */
+    INDEX_LIST indices;
+    unsigned int array_size;
+    TYPE temp_type = type;
 
-		
-			indices = indices->next;
-		}
-	}
+    /* For subrange */
+    long low, high;
 
-	return a_size;
+    switch(tag){
+    	case TYUNSIGNEDCHAR:
+    		return 1;//sizeof(unsigned char);
+    	case TYSIGNEDCHAR:
+    		return 1;//sizeof(signed char);
+    	case TYUNSIGNEDSHORTINT:
+    		return 2;//sizeof(unsigned short int);
+    	case TYSIGNEDSHORTINT:
+    		return 2;//sizeof(signed short int);
+    	case TYUNSIGNEDINT:
+    		return 4;//sizeof(unsigned int);
+    	case TYSIGNEDINT:
+    		return 4;//sizeof(signed int);
+    	case TYUNSIGNEDLONGINT:
+    		return 4;//sizeof(unsigned long int);
+    	case TYSIGNEDLONGINT:
+    		return 4;//sizeof(signed long int);
+    	case TYFLOAT:
+    		return 4;//sizeof(float);
+    	case TYDOUBLE:
+    		return 8;//sizeof(double);
+    	case TYLONGDOUBLE:
+    		return 8;//sizeof(long double);
+    	case TYARRAY:
+    		/* Get array size recursively */
+    		array_size = get_size(ty_query_array(type, &indices));
+    		/* While indices != NULL */
+			while (indices) { 
+				/* Get the low and high values */
+				ty_query_subrange(indices->type,&low,&high);
+				/* Calculate new array_size */
+				array_size *= high - low + 1;
+				/* Go to next indice */		
+				indices = indices->next;
+			}		
+			return array_size;	
+    	case TYSUBRANGE:
+    		return get_size(ty_query_subrange(type, &low, &high));
+    	case TYPTR:
+    		return 4;//sizeof(char *);
+    	// case TYVOID:
+    	// 	return 0;
+    	// case TYSTRUCT:
+    	// 	return 0;
+    	// case TYUNION:
+    	// 	return 0;
+    	// case TYENUM:
+    	// 	return 0;
+    	// case TYSET:
+    	// 	return 0;
+    	//case TYFUNC:
+    	// 	return -98;
+    	// case TYBITFIELD:
+    	// 	return 0;
+    	//case TYERROR:
+    	//	return -99;
+    	default:
+    		bug("Illegal type tag %d in get_size", tag);
+    		return 0;
+    }
 }
 
-int simple_size (TYPE type)
-{
-	TYPETAG tag;
-	unsigned int length;
-	INDEX_LIST i;
+int get_align(TYPE type){
 
-	tag = ty_query(type);
-	switch (tag)
-	{
-		case TYARRAY:
-			length = simple_size(ty_query_array(type, &i));
-			break;
-		case TYSET:
-			bug("illegal typetag (%d) in \"get_size\"", tag);
-			break;
-		case TYPTR:
-			length = 4;
-			break;
-		case TYSTRUCT:
-			bug("illegal typetag (%d) in \"get_size\"", tag);
-			break;
-		case TYUNION:
-			bug("illegal typetag (%d) in \"get_size\"", tag);
-			break;
-		case TYENUM:
-			bug("illegal typetag (%d) in \"get_size\"", tag);
-			break;
-		case TYFUNC:
-			break;
-		case TYSUBRANGE:
-			length = simple_size(ty_strip_modifier(type));
-			break;
-		case TYFLOAT:
-			length = 4;
-			break;
-		case TYDOUBLE:
-			length = 8;	
-			break;
-		case TYLONGDOUBLE:
-			length = 8;
-			break;
-		case TYUNSIGNEDINT:
-			length = 4;
-			break;
-		case TYUNSIGNEDCHAR:
-			length = 1;
-			break;
-		case TYUNSIGNEDSHORTINT:
-			length = 2;
-			break;
-		case TYUNSIGNEDLONGINT:
-			length = 4;
-			break;
-		case TYSIGNEDCHAR:
-			length = 1;
-			break;
-		case TYSIGNEDINT:
-			length = 4;
-			break;
-		case TYSIGNEDLONGINT:
-			length = 4;
-			break;
-		case TYSIGNEDSHORTINT:
-			length = 2;
-			break;
-		case TYVOID:
-			break;
-		case TYERROR:
-			break;
-		default:
-			bug("illegal typetag (%d) in \"ty_print_type\"", tag);
-	}
+    /* Get the TYPETAG from ty_query */
+    TYPETAG tag;
+    tag = ty_query(type);
 
-	return length;
+    /* For arrays */
+    INDEX_LIST indices;
+
+    /* For subrange */
+    long low, high;
+
+    switch(tag){
+    	case TYUNSIGNEDCHAR:
+    		return 1;//sizeof(unsigned char);
+    	case TYSIGNEDCHAR:
+    		return 1;//sizeof(signed char);
+    	case TYUNSIGNEDSHORTINT:
+    		return 2;//sizeof(unsigned short int);
+    	case TYSIGNEDSHORTINT:
+    		return 2;//sizeof(signed short int);
+    	case TYUNSIGNEDINT:
+    		return 4;//sizeof(unsigned int);
+    	case TYSIGNEDINT:
+    		return 4;//sizeof(signed int);
+    	case TYUNSIGNEDLONGINT:
+    		return 4;//sizeof(unsigned long int);
+    	case TYSIGNEDLONGINT:
+    		return 4;//sizeof(signed long int);
+    	case TYFLOAT:
+    		return 4;//sizeof(float);
+    	case TYDOUBLE:
+    		return 8;//sizeof(double);
+    	case TYLONGDOUBLE:
+    		return 8;//sizeof(long double);
+    	case TYARRAY:
+    		return get_align(ty_query_array(type, &indices));
+    	case TYSUBRANGE:
+    		return get_align(ty_query_subrange(type, &low, &high));
+    	case TYPTR:
+    	 	return 4;//sizeof(char *);
+    	// case TYVOID:
+    	// 	return 0;
+    	// case TYSTRUCT:
+    	// 	return 0;
+    	// case TYUNION:
+    	// 	return 0;
+    	// case TYENUM:
+    	// 	return 0;
+    	// case TYSET:
+    	// 	return 0;
+    	//case TYFUNC:
+    	// 	return -98;
+    	// case TYBITFIELD:
+    	// 	return 0;
+    	//case TYERROR:
+    	// 	return -99;
+    	default:
+    		bug("Illegal type tag %d in get_align", tag);
+    		return 0;
+    }
 }
