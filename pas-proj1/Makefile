@@ -36,9 +36,15 @@ CFLAGS = -g
 #
 BACKEND = backend-x86
 
+<<<<<<< HEAD
 PPC3H	= defs.h types.h symtab.h $(BACKEND).h encode.h
 
 PPC3OBJ = main.o message.o symtab.o types.o utils.o gram.o scan.o $(BACKEND).o encode.o
+=======
+PPC3H	= defs.h types.h symtab.h $(BACKEND).h tree.h encode.h
+
+PPC3OBJ = main.o message.o symtab.o types.o utils.o gram.o scan.o $(BACKEND).o tree.o encode.o
+>>>>>>> master
 
 # ppc3 rules
 #
@@ -48,6 +54,10 @@ ppc3     : $(PPC3OBJ)
 # dependencies for compiler modules
 
 main.o: main.c defs.h types.h symtab.h
+
+tree.o: tree.c tree.h types.h message.h symtab.h
+
+encode.o: encode.c encode.h tree.h types.h message.h backend-x86.h symtab.h 
 
 types.o: types.c types.h symtab.h message.h
 
@@ -76,5 +86,5 @@ y.output: gram.y
 	$(YACC) -v -y gram.y
 
 clean:
-	-rm -f ppc3 *.o y.tab.h y.output y.tab.c
+	-rm -f ppc3 *.o y.tab.h y.output y.tab.c *.err *.s
 

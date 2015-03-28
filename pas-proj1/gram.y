@@ -46,7 +46,11 @@
 
 %{
 
+<<<<<<< HEAD
 //#include "tree.h"
+=======
+#include "tree.h"
+>>>>>>> master
 #include "encode.h"
 
 /* Cause the `yydebug' variable to be defined.  */
@@ -81,9 +85,9 @@ void yyerror(const char *);
 
 %type <y_string>  new_identifier_1
 %type <y_int> sign unsigned_number number constant
-%type <y_type> typename type_denoter type_denoter_1 new_ordinal_type
+%type <y_type> typename type_denoter new_ordinal_type
 %type <y_type> subrange_type new_procedural_type ordinal_index_type
-%type <y_type> array_type unpacked_structured_type new_structured_type
+%type <y_type> array_type set_type record_type new_structured_type
 %type <y_type> functiontype new_pointer_type pointer_domain_type
 %type <y_paramlist> optional_procedural_type_formal_parameter_list
 %type <y_paramlist> procedural_type_formal_parameter_list
@@ -185,7 +189,11 @@ program_heading:
   ;
 
 optional_par_id_list:
+<<<<<<< HEAD
     /* empty */
+=======
+    /* empty */		{}
+>>>>>>> master
   | '(' id_list ')'  { $$ = $2; }
   ;
 
@@ -297,10 +305,17 @@ constant_definition:
   ;
 
 constant: /* number only now */
+<<<<<<< HEAD
     identifier
   | sign identifier
   | number  { $$ = $1; }
   | constant_literal
+=======
+    identifier {}
+  | sign identifier {}
+  | number  { $$ = $1; }
+  | constant_literal {}
+>>>>>>> master
   ;
 
 number:
@@ -355,7 +370,11 @@ type_denoter:
   ;
 
 new_ordinal_type: /* default actions to pass TYPE through */
+<<<<<<< HEAD
     enumerated_type
+=======
+    enumerated_type {}
+>>>>>>> master
   | subrange_type  { $$ = $1; }
   ;
 
@@ -387,8 +406,13 @@ pointer_char:
   ;
 
 pointer_domain_type:
+<<<<<<< HEAD
     new_identifier      { $$ = ty_build_unresolved_ptr($1); }
   | new_procedural_type  { $$ = ty_build_ptr($1); };
+=======
+    new_identifier      {$$ = build_unresolved_pointer(ty_build_unresolved_ptr($1), NULL);}//{ $$ = ty_build_unresolved_ptr($1); }
+  | new_procedural_type  {$$ = build_unresolved_pointer(ty_build_ptr($1), $1);} //{ $$ = ty_build_ptr($1); };
+>>>>>>> master
   ;
 
 new_procedural_type: /* builds FUNC TYPE */
@@ -440,11 +464,19 @@ ordinal_index_type: /* default actions to pass TYPE through */
 
 /* sets */
 set_type:
+<<<<<<< HEAD
     LEX_SET LEX_OF type_denoter
   ;
 
 record_type:
     LEX_RECORD record_field_list LEX_END
+=======
+    LEX_SET LEX_OF type_denoter {}
+  ;
+
+record_type:
+    LEX_RECORD record_field_list LEX_END {}
+>>>>>>> master
   ;
 
 record_field_list:
@@ -515,7 +547,7 @@ variable_declaration_list:
   ;
 
 variable_declaration:
-    id_list ':' type_denoter semi  { create_gdecl($1, $3); decl($3, $1);}
+    id_list ':' type_denoter semi  { create_gdecl($1, $3); declare_var($1, $3);}
   ;
 
 function_declaration:
@@ -539,7 +571,11 @@ directive:
   ;
 
 functiontype:
+<<<<<<< HEAD
     /* empty */
+=======
+    /* empty */	{}
+>>>>>>> master
   | ':' typename  { $$ = check_function_type($2); }
   ;
 

@@ -6,10 +6,18 @@
 #include "defs.h"
 #include "types.h"
 #include "message.h"
+<<<<<<< HEAD
 
 /* This method declares and allocates a variable by 
    setting the alignment and size for the appropriate type */
 void declare_var(ST_ID st_id, TYPE type);
+=======
+#include "tree.h"
+
+/* This method declares and allocates a variable by 
+   setting the alignment and size for the appropriate type */
+void declare_var(VAR_ID_LIST list_id, TYPE type);//ST_ID st_id, TYPE type);
+>>>>>>> master
 
 /* This method returns the size of a type based on the type given */
 unsigned int get_size(TYPE type);
