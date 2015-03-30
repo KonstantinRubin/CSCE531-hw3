@@ -1,16 +1,25 @@
+/****************************************************************/
+/*																*/
+/*	CSCE531 - "Pascal" and "C" Compilers						*/
+/*																*/
+/*	--tree.c--													*/
+/*																*/
+/*	This File Contains routines that support the				*/
+/*	"Tree Module".												*/
+/*																*/
+/*	Konstantin Rubin											*/
+/*  Maximus Brandel												*/
+/*	Ibrahim Elsayed												*/
+/****************************************************************/
+
 #include <stdlib.h>
 #include "tree.h"
-
 #include <stdio.h>
-
 
 /* This function creates a new type name data record and install it in the symbol table.
  * It take two parameters; the name of the type name as a char array, and a type object.
  * If the type name is already installed in the symbol table a warning message is issued.
  */
-
-
-
  
 //TYPE_REC  and type_rec - structures
 //TYPE - pointer to TYPE_REC
