@@ -1,4 +1,4 @@
-Comments for self-test -------- Sat Mar 28, 2015 at 13:36:58 EDT
+Comments for self-test -------- Sat Mar 28, 2015 at 13:45:39 EDT
 No illegal files found
 Testing ppc3:
   Attempting to build ppc3 ... ok
@@ -42,8 +42,8 @@ Running ppc3 with input T1L100_err.pas ... zero termination status
 Summary for self-test:
   T1L80_ok:  ok
   T1L80_err:  error message(s) (check appropriateness)
-  T1L90_ok:  ok
   T1L90_err:  error message(s) (check appropriateness)
+  T1L90_ok:  ok
   T1L100_err:  error message(s) (check appropriateness)
   T1L100_ok:  ok
   ppc3:  ok
