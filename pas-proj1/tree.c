@@ -1,81 +1,41 @@
+/****************************************************************/
+/*																*/
+/*	CSCE531 - "Pascal" and "C" Compilers						*/
+/*																*/
+/*	--tree.c--													*/
+/*																*/
+/*	This File Contains routines that support the				*/
+/*	"Tree Module".												*/
+/*																*/
+/*	Konstantin Rubin											*/
+/*  Maximus Brandel												*/
+/*	Ibrahim Elsayed												*/
+/****************************************************************/
+
 #include <stdlib.h>
 #include "tree.h"
-
+#include "types.h"
 #include <stdio.h>
-
-
-/* This function creates a new type name data record and install it in the symbol table.
- * It take two parameters; the name of the type name as a char array, and a type object.
- * If the type name is already installed in the symbol table a warning message is issued.
- */
-
-
-
- 
-//TYPE_REC  and type_rec - structures
-//TYPE - pointer to TYPE_REC
-
-typedef struct type_rec
-{
-    TYPETAG tag;
-    union
-    {
-	struct
-	{
-	    INDEX_LIST indices;
-	    struct type_rec *object;
-	} array;
-	struct
-	{
-	    struct type_rec *object;
-	} set;
-	struct
-	{
-	    PARAM_LIST params;
-	    BOOLEAN check_args;
-	    struct type_rec *object;
-	} function;
-	struct
-	{
-	    struct type_rec *object;
-	    ST_ID id;
-	    struct type_rec *next;
-	} pointer;
-	struct
-	{
-	    MEMBER_LIST members;
-	} record;
-	struct
-	{
-	    unsigned int num_values;
-	} enumeration;
-	struct
-	{
-	    struct type_rec *base_type;
-	    long low, high;
-	} subrange;
-    } u;	
-} TYPE_REC;
 
 /* Endogenous linked list of currently unresolved pointer types.
    Initially empty */
-static TYPE_REC *unresolved_pointers = NULL;
-TYPE build_unresolved_pointer(TYPE ret_type, TYPE object) //created
+static TYPE_LIST LIST_OF_UNRESOLVED_PTRS = NULL;
+TYPE build_unresolved_pointer(TYPE ret_type, TYPE object)
 {
-	if (object == NULL)
-    {
-	/* insert into the list of unresolved pointers */
-	ret_type->u.pointer.next = unresolved_pointers;
-	unresolved_pointers = ret_type;
-    }
-    else
-	ret_type->u.pointer.next = NULL;
-
+	TYPE_LIST new_unresolved_pointer;
+	new_unresolved_pointer = (TYPE_LIST) malloc(sizeof(TLIST_NODE));
+	if (object == NULL){
+		new_unresolved_pointer->type = ret_type; 
+		new_unresolved_pointer->next = LIST_OF_UNRESOLVED_PTRS;
+		LIST_OF_UNRESOLVED_PTRS = new_unresolved_pointer;
+	}
+	else
+		new_unresolved_pointer->next = NULL;
 	return ret_type;
-}
- 
-//should be good
-void create_typename(ST_ID id,TYPE new_type) //good
+} 
+
+/* Install a typename into the symbol table */
+void create_typename(ST_ID id,TYPE new_type)
 {
 	ST_DR new_data_rec;
 	new_data_rec= stdr_alloc();
@@ -89,23 +49,19 @@ void create_typename(ST_ID id,TYPE new_type) //good
 		// Issue an error message 
 		error("This Type name is already installed");
 	}
-
 }
-
-
-void create_gdecl(VAR_ID_LIST list,TYPE type) //fixed
+/* Install a global variable declaration into the symbol table */
+void create_gdecl(VAR_ID_LIST list,TYPE type)
 {
-       //checking if the variable has a type 
+    //checking if the variable has a type 
 	if (ty_query(type) == TYFUNC) {
-		error("Variable(s) must be of data type");
-		
+		error("Variable(s) must be of data type");		
 	}
 
 	ST_DR new_data_rec;
 
 	while(list!=NULL)
 	{
-
 		resolve_all_ptr();
 
 		new_data_rec = stdr_alloc();
@@ -117,15 +73,12 @@ void create_gdecl(VAR_ID_LIST list,TYPE type) //fixed
 		new_data_rec->u.decl.is_ref=FALSE;
 		new_data_rec->u.decl.err = (ty_query(type) == TYERROR ? TRUE : FALSE);
 
-
 		// Install the new data record in the symbol table
 		if (!st_install(list->id,new_data_rec)) {
 			//writing an error message
 			error("Duplicate variable declaration: \"%s\"", st_get_id_str(list->id));
 			free(new_data_rec);
 		}
-
-               // simple_allocate_space(st_get_id_str(list->id), type);
 
 		list=list->next;
 	}
@@ -136,7 +89,7 @@ void create_gdecl(VAR_ID_LIST list,TYPE type) //fixed
  * It take one parameter; an ST_ID.If the ID was NULL a bug is found.
  * As an output it returns a type object; if the error is issued then an error type is returned else the original type is returned.
  */
-TYPE check_typename(ST_ID id) { //seems good
+TYPE check_typename(ST_ID id) {
 	
 	ST_DR chcktype;
 	int chck;
@@ -158,7 +111,7 @@ TYPE check_typename(ST_ID id) { //seems good
  * It take two parameters; both an int representing the first and second indexes. 
  * As an output it returns a type object; if the error is issued then an error type is returned else the original type is returned.
  */
-TYPE check_subrange(long a, long b) { //seems good
+TYPE check_subrange(long a, long b) {
 	if (a < b) {
 		return ty_build_subrange(ty_build_basic(TYSIGNEDLONGINT), a, b);
 	}
@@ -173,7 +126,7 @@ TYPE check_subrange(long a, long b) { //seems good
  * It take one parameter; a type object.If the type was a function then an error message is issued.
  * As an output it returns a type object; if the error is issued then an error type is returned else the original type is returned.
  */
-TYPE check_function_type(TYPE type) { //seems good
+TYPE check_function_type(TYPE type) {
 	if (ty_query(type) == TYERROR) {
 		error("Error in the function return type");
 		return ty_build_basic(TYERROR);
@@ -197,8 +150,7 @@ TYPE check_function_type(TYPE type) { //seems good
  error is issued .
  * As an output it returns a type object; if the error is issued then an error type is returned else an array type is returned.
  */
-
-TYPE check_array(TYPE type, INDEX_LIST i) { // seems good
+TYPE check_array(TYPE type, INDEX_LIST i) {
 	if (ty_query(type) == TYERROR) {
 		error("Data type expected for array elements");
 		return ty_build_basic(TYERROR);
@@ -214,7 +166,6 @@ TYPE check_array(TYPE type, INDEX_LIST i) { // seems good
 }
 
 /* build a variable id list by pushing new id to the front */
-
 VAR_ID_LIST build_var_id_list (VAR_ID_LIST list,ST_ID id)
 {
   VAR_ID_LIST id_list, temp_list;
@@ -226,45 +177,42 @@ VAR_ID_LIST build_var_id_list (VAR_ID_LIST list,ST_ID id)
  //checking if the list is empty 
   if (list!=NULL)
   {
-       // pushing the list to the back of new id 
+    	// pushing the list to the back of new id 
         id_list->next=list;
-
-  }
- 
-  return id_list;
-  
+  } 
+  return id_list;  
 }
 
+/* Build a parameter list  */
 PARAM_LIST build_param_list(VAR_ID_LIST id_list,TYPE type,BOOLEAN value)
 {
 	//creates a parameter list from single type list of ids: a,b,c : Real
 	VAR_ID_LIST id_ptr = id_list;
 	PARAM_LIST head = NULL;
-        PARAM_LIST new;
+    PARAM_LIST new_param;
 
 	while(id_ptr != NULL)
 	{
-          //adding values to the new id
-	   new = (PARAM_LIST) malloc(sizeof(PARAM));
-           new->id = id_ptr->id;
-           new->type = type;
-	   new->sc = NO_SC;
-	   new->err = FALSE;
-           new->is_ref = value;
-	   new->prev = NULL;
-	   new->next = NULL;
+       //adding values to the new id
+	   new_param = (PARAM_LIST) malloc(sizeof(PARAM));
+       new_param->id = id_ptr->id;
+       new_param->type = type;
+	   new_param->sc = NO_SC;
+	   new_param->err = FALSE;
+       new_param->is_ref = value;
+	   new_param->prev = NULL;
+	   new_param->next = NULL;
        
-           new->next=head;
-           head=new;
-            //moving id_ptr to the next node 
-            id_ptr = id_ptr->next;
+       new_param->next=head;
+       head=new_param;
+       //moving id_ptr to the next node 
+       id_ptr = id_ptr->next;
 	}
 
-	return new;
-
+	return new_param;
 }
 
-PARAM_LIST check_param(PARAM_LIST p) //seems good
+PARAM_LIST check_param(PARAM_LIST p) 
 {
 	
 	if (!p) bug("%s:%d check_params received a NULL pointer\n", __FILE__, __LINE__);
@@ -294,8 +242,7 @@ PARAM_LIST check_param(PARAM_LIST p) //seems good
  * It takes two parameters,both are parameter lists.
  * As an output, it returns a parameter list that includes both of the input parameter lists.
  */
-
-PARAM_LIST concatenate_param_list (PARAM_LIST list1,PARAM_LIST list2) //seems good
+PARAM_LIST concatenate_param_list (PARAM_LIST list1,PARAM_LIST list2)
 {
 	if (!list1 && !list2) return NULL;	
 	if (!list1) return list2;		
@@ -316,7 +263,6 @@ PARAM_LIST concatenate_param_list (PARAM_LIST list1,PARAM_LIST list2) //seems go
  * It takes two parameters,one is an index list, and the other is atype object.
  * As an output, it returns an index_list with the new node included.
  */
-
 INDEX_LIST concatenate_index_lists (INDEX_LIST list1,TYPE type)
 {
 	INDEX_LIST ptr, list2;
@@ -338,7 +284,7 @@ INDEX_LIST concatenate_index_lists (INDEX_LIST list1,TYPE type)
  * It takes one parameter,a type object; which should be a subrange.
  * As an output, it returns an index_list.
  */
-INDEX_LIST create_list_from_type(TYPE type) // seems good
+INDEX_LIST create_list_from_type(TYPE type)
 {
 	if (ty_query(type) == TYERROR) return NULL;
 	INDEX_LIST index;
@@ -354,53 +300,34 @@ INDEX_LIST create_list_from_type(TYPE type) // seems good
  * It takes no parameter and returns nothing.
  * An error message is issued for every unresolved pointer.
  */
-
 void resolve_all_ptr()
 {
-	int junk;
+	int block;
 	ST_ID id;
 	ST_DR data_rec;
-	TYPE unresolved,temp,temp_ptr;
 
-	//unresolved=ty_get_unresolved();
-    TYPE_REC *ret_type = unresolved_pointers;
-    unresolved_pointers = NULL;
-    unresolved = ret_type;
+    TYPE_LIST unresolved = LIST_OF_UNRESOLVED_PTRS;
+    LIST_OF_UNRESOLVED_PTRS = NULL;
 	
 	while(unresolved!=NULL)
 	{
-		//temp_ptr = ty_query_ptr(unresolved, &id, &temp); // different
-		//
-		if (unresolved->tag != TYPTR)
-		bug("illegal type in \"ty_query_ptr\"");
-
-		if (unresolved->u.pointer.object == NULL)
+		ty_query_ptr(unresolved->type, &id);
+		data_rec = st_lookup(id,&block);
+		if (data_rec == NULL)
 		{
-		*&id = unresolved->u.pointer.id;
-		*&temp = unresolved->u.pointer.next;
-		}
-		else
-		*&id = *&temp = NULL;
-
-		temp_ptr = unresolved->u.pointer.object;
-		//
-
-		data_rec = st_lookup(id,&junk);
-		if (data_rec == NULL) {
 			error("Unresolved type name: \"%s\"", st_get_id_str(id));
-			unresolved = temp;
+			unresolved = unresolved->next;
 			continue;
 		}
 		if (data_rec->tag == TYPENAME)
 		{
-			if(!ty_resolve_ptr(unresolved, data_rec->u.typename.type))//good
+			if(!ty_resolve_ptr(unresolved->type, data_rec->u.typename.type))
 				error("Unresolved type name: \"%s\"", st_get_id_str(id));
 		}	
 		else
 		{
 			error("Unidentified type tag\n");
 		}
-		unresolved=temp;
+		unresolved=unresolved->next;
 	}
-
 }

@@ -8,7 +8,8 @@
 /*	"Encode Module".											*/
 /*																*/
 /*	Maximus Brandel												*/
-/*																*/
+/*  Konstantin Rubin											*/
+/*	Ibrahim Elsayed												*/
 /****************************************************************/
 
 #include <stdlib.h>

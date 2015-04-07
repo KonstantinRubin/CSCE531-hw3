@@ -1,3 +1,15 @@
+/****************************************************************/
+/*																*/
+/*	CSCE531 - "Pascal" and "C" Compilers						*/
+/*																*/
+/*	--gram.y--													*/
+/*																*/
+/*																*/
+/*	Ibrahim Elsayed												*/
+/*  Konstantin Rubin											*/
+/*	Maximus Brandel												*/
+/****************************************************************/
+
 /*A Bison parser for the programming language Pascal.
   Copyright (C) 1989-2002 Free Software Foundation, Inc.
 
