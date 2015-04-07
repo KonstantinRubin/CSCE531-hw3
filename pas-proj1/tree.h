@@ -11,11 +11,6 @@ typedef struct var_id {
 } VAR_ID, *VAR_ID_LIST;
    
 TYPE build_unresolved_pointer(TYPE ret_type, TYPE object);
-/* 
-This function creates a new type name data record and installs it in the symbol table. 
-It takes two parameters; the name of the type name as a char array, and a type object.
-If the type name is already installed in the symbol table a warning message is issued.
-*/
 
 void create_typename(ST_ID id,TYPE new_type);
 
